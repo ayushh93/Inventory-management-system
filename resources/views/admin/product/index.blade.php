@@ -40,7 +40,7 @@
                                             <th>Product</th>
                                             <th>Category</th>
                                             <th>Brand</th>
-                                            <th>Stock</th>
+                                            
                                             <th>Price</th>
                                             <th>Status</th>
                                             <th>Action</th>
@@ -75,8 +75,8 @@
                                                     @endif
                                                 </td>
                                         
-                                        <td><span class="badge badge-success">In stock</span></td>
-                                        <td>{{ $item->price }}</td>
+                                        
+                                        <td>Rs. {{ $item->price }}</td>
                                         <td>
                                             @if ($item->status == 1)
                                                 <span class="badge badge-success">Active</span>
@@ -136,7 +136,7 @@
                                             <th>Product</th>
                                             <th>Category</th>
                                             <th>Brand</th>
-                                            <th>Stock</th>
+                                            
                                             <th>Price</th>
                                             <th>Status</th>
                                             <th>Action</th>

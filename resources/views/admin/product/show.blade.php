@@ -5,7 +5,7 @@
             <div class="page-title">
                 <div class="row">
                     <div class="col-6">
-                        <h3>Product Attribute</h3>
+                        <h3>Product Details</h3>
                     </div>
                     <div class="col-6">
                         <ol class="breadcrumb">
@@ -33,11 +33,16 @@
                                             @if (!empty($product->brand->brand_name))
                                                 {{ $product->brand->brand_name }}
                                             @else
-                                                None
+                                            <span class="text-danger">None</span> 
                                             @endif
                                         </span></li>
                                     <li><strong>Category:</strong> <span
-                                            class="category-name">{{ $product->category->category_name }}</span></li>
+                                            class="category-name">@if(!empty( $product->category->category_name))
+                                            {{ $product->category->category_name }}
+                                        @else
+                                        <span class="text-danger">Uncategorised</span> 
+                                        @endif
+                                    </span></li>
                                     <li><strong>Price: </strong><span class="category-name">{{ $product->price }}</span></li>
                                     <li><strong>Status:</strong>
                                         @if ($product->status == 1 )

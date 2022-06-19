@@ -112,11 +112,13 @@ class ProductController extends Controller
      */
     public function show($id)
     {
+        //session
+        Session::put('admin_page', 'product');
         //
         $product = Product::findorfail($id);
         $productDetails = Product::with('productattribute')->where(['id' => $id])->first();
         $productImages = Product::with('productImage')->where(['id' => $id])->first();
-        return view('admin.product.show',compact('product','productDetails','productImages'));
+        return view('admin.product.show', compact('product', 'productDetails', 'productImages'));
     }
 
     /**
@@ -224,11 +226,9 @@ class ProductController extends Controller
         }
         //product gallery delete from folder
         $gallery_path = 'uploads/product/gallery/';
-        if(count($product->productImage))
-        {
+        if (count($product->productImage)) {
             $images = $product->productImage;
-            foreach($images as $image)
-            {
+            foreach ($images as $image) {
                 if (file_exists($gallery_path . $image->image)) {
                     unlink($gallery_path . $image->image);
                 }
@@ -243,4 +243,50 @@ class ProductController extends Controller
             Session::flash('error_message', 'Product could not be deleted');
         return redirect()->back();
     }
+
+    public function productIn()
+    {
+         //session
+         Session::put('admin_page', 'productIn');
+         //
+         $product = ProductAttribute::orderby('SKU', 'asc')->get();
+        return view('admin.product.productIn',compact('product'));
+    }
+    public function addStock(Request $request, $id)
+    {
+        $product = ProductAttribute::findorfail($id);
+        $validateData = $request->validate([
+            'stock_add' => 'required|numeric',
+        ]);
+        $product->stock  =  $product->stock + $request->input('stock_add');
+        $status = $product->save();
+        if ($status) {
+            Session::flash('success_message', 'Product stock Has Been updated Successfully');
+        } else
+            Session::flash('error_message', 'Product stock could not be updated');
+        return redirect()->back();
+    }
+    public function productOut()
+    {
+         //session
+         Session::put('admin_page', 'productOut');
+         //
+         $product = ProductAttribute::orderby('SKU', 'asc')->get();
+        return view('admin.product.productOut',compact('product'));
+    }
+    public function removeStock(Request $request, $id)
+    {
+        $product = ProductAttribute::findorfail($id);
+        $validateData = $request->validate([
+            'stock_remove' => 'required|numeric',
+        ]);
+        $product->stock  =  $product->stock - $request->input('stock_remove');
+        $status = $product->save();
+        if ($status) {
+            Session::flash('success_message', 'Product stock Has Been updated Successfully');
+        } else
+            Session::flash('error_message', 'Product stock could not be updated');
+        return redirect()->back();
+    }
+
 }

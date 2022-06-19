@@ -52,6 +52,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('/brands', BrandController::class);
         Route::post('/brand/updatebrandstatus/{id}', [BrandController::class, 'updateBrandStatus'])->name('updateBrandStatus');
         Route::resource('/users', UserController::class);
+        //product in and out
+        Route::get('/products/productsIn',[ProductController::class,'productIn'])->name('products.productIn');
+        Route::post('/products/productsIn/update/{id}',[ProductController::class,'addStock'])->name('products.addStock');
+        Route::get('/products/productsOut',[ProductController::class,'productOut'])->name('products.productOut');
+        Route::post('/products/productsOut/update/{id}',[ProductController::class,'removeStock'])->name('products.removeStock');
+
+
+
+        //product resource
         Route::resource('/products', ProductController::class);
         //product attribute
         Route::get('/product/productattributes/{id}', [AdminProductAttributeController::class,'addAttribute'])->name('product.addAttribute');
@@ -62,6 +71,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/product/productimages/{id}', [AdminProductAttributeController::class,'addImage'])->name('product.addImage');
         Route::POST('/product/productimages/store', [AdminProductAttributeController::class,'storeImage'])->name('product.storeImage');
         Route::get('/product/productimages/delete/{id}', [AdminProductAttributeController::class,'deleteImage'])->name('product.deleteImage');
+        
+
 
     });
 });

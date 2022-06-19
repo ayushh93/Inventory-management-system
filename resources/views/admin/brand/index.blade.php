@@ -84,6 +84,7 @@
                                                             <i class="fa-solid fa-trash-can"></i>
                                                         </button>
                                                     </form>
+                                                    {{-- <a href="{{ route('admin.brands.destroy', $item->id) }}" class="delete-confirm"> delete</a> --}}
                                                 </td>
                                             </tr>
                                             <!-- Add Department Modal -->
