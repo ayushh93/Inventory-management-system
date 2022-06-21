@@ -12,4 +12,14 @@ class ProductAttribute extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    public function purchaseLog()
+    {
+        return $this->hasMany(PurchaseLog::class);
+    }
+    public function salesLog()
+    {
+        return $this->hasMany(SalesLog::class);
+    }
+
+   
 }

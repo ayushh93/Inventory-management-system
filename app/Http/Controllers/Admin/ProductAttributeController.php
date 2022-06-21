@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductAttribute;
 use App\Models\ProductImage;
+use App\Models\Purchase;
+use App\Models\PurchaseLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Intervention\Image\Facades\Image;
@@ -18,23 +20,26 @@ class ProductAttributeController extends Controller
     {
         $product = Product::findorfail($id);
         $productDetails = Product::with('productattribute')->where(['id' => $id])->first();
-        return view('admin.product.addattribute',compact('product','productDetails'));
+        return view('admin.product.addattribute', compact('product', 'productDetails'));
     }
     public function storeattribute(Request $request)
     {
         // $validateData = $request->validate([
-        //     'sku[]' => 'required|max:40|min:4',
-        //     'price[]' => 'required | numeric | digits_between:1,10 ',
-        //     'stock[]' => 'required|numeric',
-        //     'low_stock[]' => 'required|numeric'
-
+        //     'sku' => 'required',
+        //     'sku.*' => 'sometimes',
+        //     'price' => 'required',
+        //     'price.*' => 'sometimes',
+        //     'stock' => 'required',
+        //     'stock.*' => 'sometimes',
+        //     'low_stock' => 'required',
+        //     'low_stock.*' => 'sometimes'
         // ]);
         $data = $request->all();
-        foreach($data['sku'] as $key => $val){
-            if(!empty($val)){
+        foreach ($data['sku'] as $key => $val) {
+            if (!empty($val)) {
                 // Checking if SKU Duplication Exists or Not
                 $attrCountSKU = ProductAttribute::where('sku', $val)->count();
-                if($attrCountSKU > 0){
+                if ($attrCountSKU > 0) {
                     return redirect()->back()->with('error_message', 'Product SKU Already Exist in our Database');
                 }
                 $attribute = new ProductAttribute();
@@ -45,19 +50,33 @@ class ProductAttributeController extends Controller
                 $attribute->price = $data['price'][$key];
                 $attribute->stock = $data['stock'][$key];
                 $attribute->low_stock = $data['low_stock'][$key];
-                $attribute->save();
+                $status = $attribute->save();
+                
+                //for purchase log
+                $id = $attribute->id; //id of above saved attribute
+                $purchaselog = new PurchaseLog();
+                $purchaselog->productAttribute_id = $id;
+                $purchaselog->sku = $val;
+                $purchaselog->size = $data['size'][$key];
+                $purchaselog->color = $data['color'][$key];
+                $purchaselog->price =$data['price'][$key];
+                $purchaselog->quantity =$data['stock'][$key];
+                $purchaselog->save();
             }
         }
-        Session::flash('success_message', 'Product Attribute Has Been Added Successfully');
-        return redirect()->back();
+        if ($status)
+            Session::flash('success_message', 'Product Attribute Has Been Added Successfully');
+        else
+            Session::flash('error_message', 'Product Attribute could not be added');
 
+        return redirect()->back();
     }
 
     public function updateAttribute(Request $request, $id)
     {
         $data = $request->all();
-        foreach($data['idAttr'] as $key => $attr){
-            ProductAttribute::where('id', $data['idAttr'][$key])->update(['price' => $data['price'][$key], 'stock' => $data['stock'][$key], 'sku' => $data['sku'][$key] ,  'size' => $data['size'][$key],  'color' => $data['color'][$key],'low_stock' => $data['low_stock'][$key]]);
+        foreach ($data['idAttr'] as $key => $attr) {
+            ProductAttribute::where('id', $data['idAttr'][$key])->update(['price' => $data['price'][$key], 'stock' => $data['stock'][$key], 'sku' => $data['sku'][$key],  'size' => $data['size'][$key],  'color' => $data['color'][$key], 'low_stock' => $data['low_stock'][$key]]);
         }
         Session::flash('success_message', 'Product Attribute Has Been updated Successfully');
         return redirect()->back();
@@ -74,34 +93,31 @@ class ProductAttributeController extends Controller
     public function addImage($id)
     {
         $product = Product::findorfail($id);
-        $productImages = Product::with('productImage')->where(['id'=> $id])->first();
-        return view('admin.product.addImage',compact('product','productImages'));
-
+        $productImages = Product::with('productImage')->where(['id' => $id])->first();
+        return view('admin.product.addImage', compact('product', 'productImages'));
     }
 
     public function storeImage(Request $request)
     {
         $data = $request->all();
-         //upload product images
-         if ($request->hasFile('image')) {
+        //upload product images
+        if ($request->hasFile('image')) {
             $files = $request->file('image');
-            foreach($files as $file)
-            {
-            $productimage = new ProductImage();
-            $filename = rand(11,9999) . '.' . $file->extension();
-            $destinationPath = public_path('uploads/product/gallery');
-            $img = Image::make($file->path());
-            $img->resize(600, 400, function ($constraint) {
-                $constraint->aspectRatio();
-            })->save($destinationPath . '/' . $filename);
-            $productimage->image = $filename;
-            $productimage->product_id =$data['product_id'];
-            $productimage->save();
-        }
+            foreach ($files as $file) {
+                $productimage = new ProductImage();
+                $filename = rand(11, 9999) . '.' . $file->extension();
+                $destinationPath = public_path('uploads/product/gallery');
+                $img = Image::make($file->path());
+                $img->resize(600, 400, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->save($destinationPath . '/' . $filename);
+                $productimage->image = $filename;
+                $productimage->product_id = $data['product_id'];
+                $productimage->save();
+            }
         }
         Session::flash('success_message', 'Product Images Has Been Added Successfully');
         return redirect()->back();
-
     }
     public function deleteImage($id)
     {

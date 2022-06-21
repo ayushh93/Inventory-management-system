@@ -46,7 +46,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($product as $item)
+                                        @foreach ($productAttribute as $item)
                                             <tr>
                                                 <td>{{ $loop->index + 1 }}</td>
                                                 <td>{{ $item->product->product_name }}</td>

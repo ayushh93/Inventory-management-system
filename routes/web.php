@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\admin\CouponController;
 use App\Http\Controllers\admin\CustomerController;
 use App\Http\Controllers\Admin\HomeController;
+use App\Http\Controllers\admin\LogsheetController;
 use App\Http\Controllers\admin\ProductAttributeController as AdminProductAttributeController;
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\UserController;
@@ -52,26 +53,29 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('/brands', BrandController::class);
         Route::post('/brand/updatebrandstatus/{id}', [BrandController::class, 'updateBrandStatus'])->name('updateBrandStatus');
         Route::resource('/users', UserController::class);
+
         //product in and out
         Route::get('/products/productsIn',[ProductController::class,'productIn'])->name('products.productIn');
         Route::post('/products/productsIn/update/{id}',[ProductController::class,'addStock'])->name('products.addStock');
         Route::get('/products/productsOut',[ProductController::class,'productOut'])->name('products.productOut');
         Route::post('/products/productsOut/update/{id}',[ProductController::class,'removeStock'])->name('products.removeStock');
-
-
-
-        //product resource
         Route::resource('/products', ProductController::class);
+
+
         //product attribute
         Route::get('/product/productattributes/{id}', [AdminProductAttributeController::class,'addAttribute'])->name('product.addAttribute');
         Route::POST('/product/productattributes/store', [AdminProductAttributeController::class,'storeAttribute'])->name('product.storeAttribute');
         Route::PUT('/product/productattributes/update/{id}', [AdminProductAttributeController::class,'updateAttribute'])->name('product.updateAttribute');
         Route::get('/product/productattributes/delete/{id}', [AdminProductAttributeController::class,'deleteAttribute'])->name('product.deleteAttribute');
+
         //product images
         Route::get('/product/productimages/{id}', [AdminProductAttributeController::class,'addImage'])->name('product.addImage');
         Route::POST('/product/productimages/store', [AdminProductAttributeController::class,'storeImage'])->name('product.storeImage');
         Route::get('/product/productimages/delete/{id}', [AdminProductAttributeController::class,'deleteImage'])->name('product.deleteImage');
         
+        //logsheet
+        Route::get('logsheet/purchaselog',[LogsheetController::class,'purchaseIndex'])->name('purchaseIndex');
+        Route::get('logsheet/saleslog',[LogsheetController::class,'salesIndex'])->name('salesIndex');
 
 
     });

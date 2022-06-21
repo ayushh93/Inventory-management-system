@@ -8,6 +8,10 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductAttribute;
 use App\Models\ProductImage;
+use App\Models\Purchase;
+use App\Models\PurchaseLog;
+use App\Models\Sale;
+use App\Models\SalesLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Intervention\Image\Facades\Image;
@@ -249,17 +253,28 @@ class ProductController extends Controller
          //session
          Session::put('admin_page', 'productIn');
          //
-         $product = ProductAttribute::orderby('SKU', 'asc')->get();
-        return view('admin.product.productIn',compact('product'));
+         $productAttribute = ProductAttribute::orderby('SKU', 'asc')->get();
+        return view('admin.product.productIn',compact('productAttribute'));
     }
     public function addStock(Request $request, $id)
     {
-        $product = ProductAttribute::findorfail($id);
+        $productAttribute = ProductAttribute::findorfail($id);
         $validateData = $request->validate([
             'stock_add' => 'required|numeric',
         ]);
-        $product->stock  =  $product->stock + $request->input('stock_add');
-        $status = $product->save();
+        $productAttribute->stock  =  $productAttribute->stock + $request->input('stock_add');
+        $status = $productAttribute->save();
+
+        //for purchase log
+        $purchaselog = new PurchaseLog();
+        $purchaselog->productAttribute_id = $productAttribute->id;
+        $purchaselog->sku = $productAttribute->SKU;
+        $purchaselog->size = $productAttribute->size;
+        $purchaselog->color = $productAttribute->color;
+        $purchaselog->price = $productAttribute->price;
+        $purchaselog->quantity = $request->input('stock_add');
+        $purchaselog->save();
+ 
         if ($status) {
             Session::flash('success_message', 'Product stock Has Been updated Successfully');
         } else
@@ -271,17 +286,28 @@ class ProductController extends Controller
          //session
          Session::put('admin_page', 'productOut');
          //
-         $product = ProductAttribute::orderby('SKU', 'asc')->get();
-        return view('admin.product.productOut',compact('product'));
+         $productAttribute = ProductAttribute::orderby('SKU', 'asc')->get();
+        return view('admin.product.productOut',compact('productAttribute'));
     }
     public function removeStock(Request $request, $id)
     {
-        $product = ProductAttribute::findorfail($id);
+        $productAttribute = ProductAttribute::findorfail($id);
         $validateData = $request->validate([
             'stock_remove' => 'required|numeric',
         ]);
-        $product->stock  =  $product->stock - $request->input('stock_remove');
-        $status = $product->save();
+        $productAttribute->stock  =  $productAttribute->stock - $request->input('stock_remove');
+        $status = $productAttribute->save();
+
+         //for sales log
+         $saleslog = new SalesLog();
+         $saleslog->productAttribute_id = $productAttribute->id;
+         $saleslog->sku = $productAttribute->SKU;
+         $saleslog->size = $productAttribute->size;
+         $saleslog->color = $productAttribute->color;
+         $saleslog->price = $productAttribute->price;
+         $saleslog->quantity = $request->input('stock_remove');
+         $saleslog->sold_by = $request->input('sold_by');
+         $saleslog->save();
         if ($status) {
             Session::flash('success_message', 'Product stock Has Been updated Successfully');
         } else

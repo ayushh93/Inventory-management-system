@@ -44,7 +44,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($product as $item)
+                                        @foreach ($productAttribute as $item)
                                             <tr>
                                                 <td>{{ $loop->index + 1 }}</td>
                                                 <td>{{ $item->product->product_name }}</td>
@@ -132,6 +132,7 @@
                                                                     </strong></label>
                                                                 <input type="number" value="{{ old('stock_remove') }}"
                                                                     name="stock_remove" max="{{$item->stock}}">
+                                                                    <input type="hidden" name="sold_by" value="{{Auth::guard('admin')->user()->name}}">
                                                                 <button type="submit" value="Remove Stock"
                                                                     class="btn btn-success btn-sm">Product Out</button>
                                                             </form>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -19,8 +20,10 @@ class UserController extends Controller
      */
     public function index()
     {
+        //session
+        Session::put('admin_page','user');
         //
-        $user = User::all();
+        $user = Admin::all();
         return view ('admin.user.index',compact('user'));
     }
 
@@ -56,10 +59,10 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()]
             
         ]);
-        $user = new User();
+        $user = new Admin();
         $user->name = $data['username'];
         $user->email = $data['email'];
-        $user->password = Hash::make($data['password']);
+        $user->password = bcrypt($data['password']);
         $status =  $user->save();
         if ($status) {
             Session::flash('success_message', 'User Has Been Added Successfully');
@@ -107,7 +110,7 @@ class UserController extends Controller
         $validateData = $request->validate([
             'password' => ['required','confirmed', Rules\Password::defaults()] 
         ]);
-        $user = User::findorfail($id);
+        $user = Admin::findorfail($id);
         $user->password = Hash::make($data['password']);
         $status =  $user->save();
         if ($status) {
@@ -127,7 +130,7 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
-        $user = User::findorfail($id);
+        $user = Admin::findorfail($id);
         $status =  $user->delete();
         if ($status) {
             Session::flash('success_message', 'User deleted Successfully');
